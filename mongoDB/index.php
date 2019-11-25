@@ -18,21 +18,21 @@ getHeader(array(),array(),false);
       <div class="carousel-caption">
           <h1 class="display-4" style="color:black;margin-right:58%;">Welcome To EduStats</h1><br>
     <p style="color:black;margin-bottom:20%;padding-right:50%;text-align: left;">A Singapore based higher education statistics website that aims to help students seeking to pursuing a degree make better informed decision though evaluation of local degrees financial opportunity cost.</p>
-          <h3 class="h3-responsive"><a class="btn btn-primary btn-lg" href="calculator.php">Try our Calculator</a></h3>
+          <h3 class="h3-responsive"><a class="btn btn-secondary btn-lg" href="calculator.php">Try our Calculator</a></h3>
       </div>
     </div>
     <div class="carousel-item">
         <img class="d-block w-100" src="img/ges.webp" width="920" height ="800"
         alt="Second slide">
       <div class="carousel-caption">
-      <h3 class="h3-responsive"><a class="btn btn-primary btn-lg" href="GES.php">Try the GES</a></h3>
+      <h3 class="h3-responsive"><a class="btn btn-secondary btn-lg" href="GES.php">Try the GES</a></h3>
       </div>
     </div>
     <div class="carousel-item">
         <img class="d-block w-100" src="img/statistics.jpg" width="920" height ="800"
         alt="Third slide">
       <div class="carousel-caption">
-      <h3 class="h3-responsive"><a class="btn btn-primary btn-lg" href="stats.php">Try calculating custom statistics</a></h3>
+      <h3 class="h3-responsive"><a class="btn btn-secondary btn-lg" href="stats.php">Try calculating custom statistics</a></h3>
       </div>
     </div>
   </div>
