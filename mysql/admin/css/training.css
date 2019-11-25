@@ -1,0 +1,72 @@
+
+
+
+nav ul li {
+    display: inline-block;
+}
+nav ul li button, nav ul li a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+
+}
+nav ul li button,
+nav ul li button:after,
+nav ul li button:before,
+nav ul li a,
+nav ul li a:after,
+nav ul li a:before {
+    transition: all .5s;
+}
+nav ul li button:hover {
+    color: #555;
+}
+
+
+/* stroke */
+nav.stroke ul li button,
+nav.fill ul li button,
+nav.stroke ul li a,
+nav.fill ul li a{
+    position: relative;
+}
+nav.stroke ul li button:after,
+nav.fill ul li button:after,
+nav.stroke ul li a:after,
+nav.fill ul li a:after{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 0%;
+    content: '.';
+    color: transparent;
+    background: #aaa;
+    height: 1px;
+}
+nav.stroke ul li button:hover:after,
+nav.stroke ul li a:hover:after{
+    width: 100%;    
+}
+
+
+button.link { 
+    background:none;border:none;
+    outline:none;
+}
+button:active {
+    border-style: outset;
+}
+
+
+#dbinfo {
+    
+    
+    height: 350px;
+    overflow-y: scroll;
+overflow-x: hidden;
+border: 1px solid;
+}
+
+
