@@ -2,36 +2,89 @@
 
 require "navmenu.php";
 
+/*
+$collection = $client->$dbName->courses;
 
+$ops = [
+  [
+      '$group' => [
+          "_id" => '$faculty_name',
+          "faculty_category" => '$faculty_category',
+          "mean_salary"   => ['$max'=>1],
+      ]
+  ]
+];
+$result = $collection->aggregate($ops)->toArray();
+
+echo json_encode($result);
+*/
+
+
+$collection = $client->$dbName->courses;
+$unique_faculty_category = $collection->distinct('faculty_category');
+$top_course_industry = array();
+
+foreach ($unique_faculty_category as $v){
+  $collection = $client->$dbName->courses;
+  $querySelection = array('projection' => array('faculty_category' => 1, "course_name"=> 1, 'mean_salary' => 1, '_id'=> 0) ,'sort' => array("mean_salary" => -1) , 'limit' => 1);
+  $result = $collection->find(['faculty_category' => $v], $querySelection)->toArray();
+  array_push($top_course_industry, $result[0]);
+}
+
+$top_course_industry_labels = array();
+$top_course_industry_values = array();
+
+foreach ($top_course_industry as $v){
+  array_push($top_course_industry_labels, array($v['faculty_category'], $v['course_name']));
+  array_push($top_course_industry_values, $v['mean_salary']);
+}
+
+$querySelection = array('projection' => array('school_name' => 1, "course_name"=> 1, 'mean_salary' => 1, '_id'=> 0) ,'sort' => array("mean_salary" => -1) , 'limit' => 5);
+$top_course_salary = $collection->find([],$querySelection)->toArray();
+
+$top_course_salary_labels = array();
+$top_course_salary_values = array();
+
+foreach ($top_course_salary as $v){
+  array_push($top_course_salary_labels, array($v['school_name'], $v['course_name']));
+  array_push($top_course_salary_values, $v['mean_salary']);
+}
+
+
+$ops = [
+  [
+      '$group' => [
+          "_id" => '$faculty_category',
+          "count"   => ['$sum'=>1],
+      ]
+  ]
+];
+
+$total_course = $collection->aggregate($ops)->toArray();
+$total_course_labels = array();
+$total_course_values = array();
+
+foreach ($total_course as $v){
+  array_push($total_course_labels, $v['_id']);
+  array_push($total_course_values, $v['count']);
+}
+
+
+/*
 $stmt = $conn->prepare("SELECT fc.faculty_category, fc.course_name, fc.mean_salary FROM full_course_view fc, 
 (select faculty_category, max(mean_salary) as mean_salary from full_course_view group by faculty_category) fc2 WHERE fc.faculty_category = fc2.faculty_category and 
 fc.mean_salary = fc2.mean_salary group by fc.faculty_category");
-$stmt->execute();
-$top_course_industry = $stmt->fetchAll(PDO::FETCH_ASSOC);
+*/
 
-$stmt = $conn->prepare("SELECT school_name, course_name, mean_salary FROM full_course_view order by mean_salary desc limit 5");
-$stmt->execute();
-$top_course_salary = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt = $conn->prepare("SELECT faculty_category, count(*) as count FROM full_course_view group by faculty_category;");
-$stmt->execute();
-$total_course = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//$querySelection = array('projection' => array('faculty_category' => 1, "course_name"=> 1, 'mean_salary' => 1, '_id'=> 0));
+/*
+$top_course_industry = $collection->distinct('faculty_name');
+
+var_dump($top_course_industry);
+*/
 getHeader();
-
-function extractAsArray($sqlArray, $count, $count2 = -1){
-    $output = [];
-
-    foreach ($sqlArray as $v){
-        $value = array_values($v);
-        if( $count2 == -1 ){
-            $output[] = $value[$count];
-        }else{
-            $output[] = array($value[$count],$value[$count2]);
-        }
-    }
-    return $output;
-}
-
 
 ?>
 
@@ -41,19 +94,21 @@ function extractAsArray($sqlArray, $count, $count2 = -1){
 <h2>Top 5 Course With Highest Mean Salary </h2>
 <canvas id="top_course_salary" class="col-sm-6"></canvas>
 <br>
-<h2>Total Of Course From Each Industry</h2>
+<h2>Total Number Of Course From Each Industry</h2>
 <canvas id="total_course" class="col-sm-6"></canvas>
-
 <script>
+
+var color = ["#FF9919", "#E85146","#CC291F","#103E54","#39ACBF","#FFC64C","#FF6737", "#FF6737", "#5779C8"];
+
 new Chart(document.getElementById("top_course_industry"), {
     type: 'horizontalBar',
     data: {
-      labels: <?php echo json_encode(extractAsArray($top_course_industry,0,1));?>,
+      labels: <?php echo json_encode($top_course_industry_labels);?>,
       datasets: [
         {
           label: "Mean Salary",
-          backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-          data: <?php echo json_encode(extractAsArray($top_course_industry,2));?>
+          backgroundColor: color,
+          data: <?php echo json_encode($top_course_industry_values);?>
         }
       ]
     },
@@ -77,12 +132,12 @@ new Chart(document.getElementById("top_course_industry"), {
 new Chart(document.getElementById("top_course_salary"), {
     type: 'horizontalBar',
     data: {
-      labels: <?php echo json_encode(extractAsArray($top_course_salary,0,1));?>,
+      labels: <?php echo json_encode($top_course_salary_labels);?>,
       datasets: [
         {
           label: "Mean Salary",
-          backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-          data: <?php echo json_encode(extractAsArray($top_course_salary,2));?>
+          backgroundColor: color,
+          data: <?php echo json_encode($top_course_salary_values);?>
         }
       ]
     },
@@ -109,11 +164,11 @@ new Chart(document.getElementById("top_course_salary"), {
 new Chart(document.getElementById("total_course"), {
     type: 'pie',
     data: {
-      labels: <?php echo json_encode(extractAsArray($total_course,0));?>,
+      labels: <?php echo json_encode($total_course_labels);?>,
       datasets: [{
         label: "Population (millions)",
-        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-        data: <?php echo json_encode(extractAsArray($total_course,1));?>
+        backgroundColor: color,
+        data: <?php echo json_encode($total_course_values);?>
       }]
     },
     options: {

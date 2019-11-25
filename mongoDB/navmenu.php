@@ -47,9 +47,6 @@ function getHeader($js = array(), $css = array(), $padding = true){
       echo '<a class="nav-link" href="stats.php">Stats</a>';
       echo '</li>';
       echo '</ul>';
-      echo '<form class="form-inline my-2 my-lg-0" action="dataConversion.php">';
-      echo '<button class="btn btn-info my-2 my-sm-0" type="submit">Refresh Data</button>';
-      echo '</form>';
       echo '<form class="form-inline my-2 my-lg-0" action="login.php">';
       echo '<button class="btn btn-info my-2 my-sm-0" type="submit">Login</button>';
       echo '</form>';

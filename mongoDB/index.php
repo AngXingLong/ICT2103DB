@@ -4,12 +4,7 @@ require "navmenu.php";
 
 getHeader(array(),array(),false);
 
-
-
 ?>
-
-
-
 
 <div class="jumbotron jumbotron-fluid">
     <div id='background'>

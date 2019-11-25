@@ -41,10 +41,13 @@ function extractAsArray($sqlArray, $count, $count2 = -1){
 <h2>Top 5 Course With Highest Mean Salary </h2>
 <canvas id="top_course_salary" class="col-sm-6"></canvas>
 <br>
-<h2>Total Of Course From Each Industry</h2>
+<h2>Total Number Of Course From Each Industry</h2>
 <canvas id="total_course" class="col-sm-6"></canvas>
 
 <script>
+
+var color = ["#FF9919", "#E85146","#CC291F","#103E54","#39ACBF","#FFC64C","#FF6737", "#FF6737", "#5779C8"];
+
 new Chart(document.getElementById("top_course_industry"), {
     type: 'horizontalBar',
     data: {
@@ -52,7 +55,7 @@ new Chart(document.getElementById("top_course_industry"), {
       datasets: [
         {
           label: "Mean Salary",
-          backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+          backgroundColor: color,
           data: <?php echo json_encode(extractAsArray($top_course_industry,2));?>
         }
       ]
@@ -81,7 +84,7 @@ new Chart(document.getElementById("top_course_salary"), {
       datasets: [
         {
           label: "Mean Salary",
-          backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+          backgroundColor: color,
           data: <?php echo json_encode(extractAsArray($top_course_salary,2));?>
         }
       ]
@@ -112,7 +115,7 @@ new Chart(document.getElementById("total_course"), {
       labels: <?php echo json_encode(extractAsArray($total_course,0));?>,
       datasets: [{
         label: "Population (millions)",
-        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+        backgroundColor: color,
         data: <?php echo json_encode(extractAsArray($total_course,1));?>
       }]
     },
@@ -140,6 +143,5 @@ new Chart(document.getElementById("total_course"), {
 });
 </script>
 <?php 
-
 getFooter();
 ?>

@@ -2,7 +2,7 @@
 
 require "navmenu.php";
 
-getHeader();
+
 
 $s_search = isset($_GET['search']) ? $_GET['search'] : "";
 $s_order_by = isset($_GET['order_by']) ? $_GET['order_by'] : "";
@@ -30,8 +30,10 @@ if($s_search == ""){
     $result = $collection->find([],$querySelection)->toArray();
 }
 else{
-    $result = $collection->find(['loan_name' => $s_search], $querySelection)->toArray() ;
+    $result = $collection->find(['loan_name' => new \MongoDB\BSON\Regex(".*".$s_search."*.(?-i)")], $querySelection)->toArray() ;
 } 
+
+getHeader();
 
 ?>
 

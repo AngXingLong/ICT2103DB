@@ -2,52 +2,53 @@
 
 require "navmenu.php";
 
-getHeader();
 
 
 $s_search = isset($_GET['search']) ? $_GET['search'] : "";
-$s_search = "%".$s_search."%";
-
 $s_order_by = isset($_GET['order_by']) ? $_GET['order_by'] : "";
 
-//s.school_name, f.faculty_name , c.course_name, shfc.mean_salary, shfc.course_fee, shfc.year_of_study
-
-$sql_order_by_extension = "";
+$sql_order_by_extension  = "school_name";
 
 switch ($s_order_by) {
     case 1:
-        $sql_order_by_extension  = "order by school_name desc";
+        $sql_order_by_extension  = "school_name";
         break;
     case 2:
-        $sql_order_by_extension  = "order by faculty_name desc";
+        $sql_order_by_extension  = "faculty_name";
         break;
     case 3:
-        $sql_order_by_extension  = "order by mean_salary desc";
-        print "a";
+        $sql_order_by_extension  = "mean_salary";
         break;
     case 4:
-        $sql_order_by_extension  = "order by course_fee desc";
+        $sql_order_by_extension  = "course_fee";
         break;
     case 5:
-        $sql_order_by_extension  = "order by year_of_study desc";
+        $sql_order_by_extension  = "year_of_study";
         break;
     case 6:
-        $sql_order_by_extension  = "order by course_name desc";
+        $sql_order_by_extension  = "course_name";
         break;
     default:
 
 }
 
+$collection = $client->$dbName->courses;
+$querySelection = array('projection' => array('school_name' => 1, "faculty_name"=> 1, 'course_name' => 1, "mean_salary" => 1, "course_fee"=> 1, "year_of_study"=> 1, '_id'=> 0) ,'sort' => array($sql_order_by_extension  => 1));
 
+if($s_search == ""){
+    $result = $collection->find([], $querySelection)->toArray();
+}
+else{
+    $result = $collection->find(['course_name' => new \MongoDB\BSON\Regex(".*".$s_search."*.(?-i)")], $querySelection)->toArray() ;
+} 
 
-$stmt = $conn->prepare("select school_name, faculty_name , course_name, mean_salary, course_fee, year_of_study from full_course_view where LOWER(course_name) like LOWER(?) $sql_order_by_extension;");
-$stmt->execute(array($s_search));
-$arr = $stmt->fetchAll(PDO::FETCH_ASSOC);
+getHeader();
+
 ?>
 
 <h1>GES Records Courses</h1>
 
-<form class="form-inline mt-4 mb-4" action="/ges.php">
+<form class="form-inline mt-4 mb-4" action="ges.php">
 <label class="mr-3">Filter: </label>
 <input type="text" name="search" class="form-control col-sm-5" value = '<?php echo isset($_GET['search']) ? $_GET['search'] : "";?>'placeholder="Search">
 
@@ -65,7 +66,7 @@ $arr = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </form>
 
 
-<?php 
-createBasicTable(array('School','Faculty','Course','Mean Salary','Course Fee','Year Of Study'),$arr);
+<?php
+createBasicTable(array('School','Faculty','Course','Mean Salary','Course Fee','Year Of Study'), array("school_name", "faculty_name", "course_name", "mean_salary", "course_fee", "year_of_study"), $result);
 getFooter();
 ?>

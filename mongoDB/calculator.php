@@ -19,27 +19,36 @@ $accumulatedInterest = array();
 $uniEarning = array();
 $opportunityCost = array();
 $years = array();
-
+  
 if($poly_get != "" & $uni_get != ""){
 
-  $stmt = $conn->prepare("select course_fee, mean_salary, year_of_study, faculty_category from full_course_view fcw where fcw.school_name = ? and fcw.course_name = ?;");
-  $stmt->execute(explode(", ", $poly_get));
-  $polyData = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
-  $stmt->execute(explode(", ", $uni_get ));
-  $uniData = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
 
-  $stmt = $conn->prepare("select s.school_name,  f.faculty_name, c.course_name, shfc.mean_salary, shfc.course_fee, shfc.year_of_study from school_have_faculty_course shfc, school s, course c, faculty f where 
-  shfc.school_id = s.school_id and shfc.course_id = c.course_id and shfc.faculty_id = f.faculty_id and school_type_id = 2 and faculty_category = ? order by shfc.mean_salary desc limit 10");
-  $stmt->execute(array($polyData['faculty_category']));
-  $recommendedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $poly_get_split = explode(", ", $poly_get);
+
+
+  $collection = $client->$dbName->courses;
+  $querySelection = array('projection' => array('course_fee' => 1, "year_of_study"=> 1, "mean_salary"=> 1, 'faculty_category' => 1, '_id'=> 0));
+  $polyData = $collection->find(['school_name' => $poly_get_split[0], 'course_name' => $poly_get_split[1]], $querySelection)->toArray();
+  $polyData = $polyData[0];
+
+  $uni_get_split = explode(", ", $uni_get);
+  $uniData = $collection->find(['school_name' => $uni_get_split[0], 'course_name' => $uni_get_split[1]], $querySelection)->toArray();
+  $uniData = $uniData[0];
+  
+
+  $querySelection = array('projection' => array('school_name' => 1, "faculty_name"=> 1, 'course_name' => 1, 'mean_salary' => 1, 'course_fee' => 1, 'year_of_study' => 1, '_id'=> 0));
+  $recommendedCourses = $collection->find(['school_name' => $uni_get_split[0], 'course_name' => $uni_get_split[1]], $querySelection)->toArray() ;
 
   if($loan_get != ""){
-    $stmt = $conn->prepare("select * from loan where loan_name = ?;");
-    $stmt->execute(array($loan_get));
-    $loanData = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
+    $collection = $client->$dbName->loan;
+    $querySelection = array('projection' => array('loan_name' => 1, "interest_rate"=> 1, 'provider_name' => 1, '_id'=> 0));
+    $loanData = $collection->find(['loan_name' => $loan_get], $querySelection)->toArray();
+
+    $loanData = $loanData[0];
   }else{
     $loanData['interest_rate'] = 0;
   }
+
   $polyYearlySalary = $polyData['mean_salary'] * 12;
   $uniYearlySalary =  $uniData['mean_salary'] * 12;
   $interest_rate = $loanData['interest_rate'];
@@ -95,28 +104,29 @@ if($poly_get != "" & $uni_get != ""){
   $uni_mean_salary = $uniData['mean_salary'];
   $uni_cost = $uniData['course_fee'];
   //Interest From Loan
-  
+
 }
+  
 
-$stmt = $conn->prepare("select concat(s.school_name, ', ', c.course_name) as poly from school s, faculty f, school_have_faculty_course shfc, course c where s.school_id = shfc.school_id and f.faculty_id = shfc.faculty_id and c.course_id = shfc.course_id and s.school_type_id = 2;");
-$stmt->execute();
-$unfilteredPolyTag = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$collection = $client->$dbName->courses;
+$querySelection = array('projection' => array('school_name' => 1, "course_name"=> 1, '_id'=> 0));
+$unfilteredPolyTag = $collection->find(["school_type"=> "Polytechnic"], $querySelection)->toArray();
 
-$stmt = $conn->prepare("select concat(s.school_name, ', ', c.course_name) as uni from school s, faculty f, school_have_faculty_course shfc, course c where s.school_id = shfc.school_id and f.faculty_id = shfc.faculty_id and c.course_id = shfc.course_id and s.school_type_id = 1;");
-$stmt->execute();
-$unfilteredUniTag = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt = $conn->prepare("select * from loan");
-$stmt->execute();
-$unfilteredLoanTag = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$collection = $client->$dbName->courses;
+$querySelection = array('projection' => array('school_name' => 1, "course_name"=> 1, '_id'=> 0));
+$unfilteredUniTag = $collection->find(["school_type"=> "University"], $querySelection)->toArray();
 
+$collection = $client->$dbName->loan;
+$querySelection = array('projection' => array('loan_name' => 1, '_id'=> 0));
+$unfilteredLoanTag = $collection->find([], $querySelection)->toArray();
 
 foreach ($unfilteredPolyTag as $v){
-  $filteredPolyTag[] = $v['poly'];
+  $filteredPolyTag[] = $v['school_name'].", ".$v['course_name'];
 }
 
 foreach ($unfilteredUniTag as $v){
-  $filteredUniTag[] = $v['uni'];
+  $filteredUniTag[] = $v['school_name'].", ".$v['course_name'];
 }
 
 foreach ($unfilteredLoanTag as $v){
@@ -127,7 +137,6 @@ foreach ($unfilteredLoanTag as $v){
 function getDataListValues($array){
     foreach ($array as $v){
       echo "<option value='$v'>";
-
     }
 }
 
@@ -172,9 +181,8 @@ function getDataListValues($array){
   <?php
       if($poly_get != "" & $uni_get != ""){
 
-        createBasicTable(array('School','Faculty','Course','Mean Salary','Course Fee','Year Of Study'),$recommendedCourses);
-       
-
+        createBasicTable(array('School','Faculty','Course','Mean Salary','Course Fee','Year Of Study'),array('school_name', "faculty_name", 'course_name', 'mean_salary', 'course_fee', 'year_of_study'),$recommendedCourses);
+      
       }
   ?>
   
