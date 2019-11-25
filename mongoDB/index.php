@@ -29,7 +29,7 @@ getHeader(array(),array(),false);
       </div>
     </div>
     <div class="carousel-item">
-        <img class="d-block w-100" src="img/statistics.webp" width="920" height ="800"
+        <img class="d-block w-100" src="img/statistics.jpg" width="920" height ="800"
         alt="Third slide">
       <div class="carousel-caption">
       <h3 class="h3-responsive"><a class="btn btn-primary btn-lg" href="stats.php">Try calculating custom statistics</a></h3>
