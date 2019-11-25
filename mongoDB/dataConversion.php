@@ -1,7 +1,7 @@
 <?php
 
 //https://docs.mongodb.com/php-library/v1.2/reference/method/MongoDBCollection-insertMany/
-require "../database.php";
+require "../mysql/database.php";
 require "mongoDatabase.php";
 /*LOANS*/
 $stmt = $conn->prepare("select l.loan_name,l.interest_rate,lp.provider_name from loan l, loanprovider lp where l.loan_provider_id = lp.loan_provider_id");
