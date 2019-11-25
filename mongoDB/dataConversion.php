@@ -30,7 +30,7 @@ $collection->insertMany($json);
 /*COURSES*/
 
 /*ACCOUNTS*/
-$stmt = $conn->prepare("select shfc.year_of_study,shfc.mean_salary,f.faculty_name,s.school_name,c.course_name,shfc.course_fee from school_have_faculty_course shfc, school s, course c, faculty f where shfc.school_id = s.school_id and shfc.course_id = c.course_id and shfc.faculty_id = f.faculty_id");
+$stmt = $conn->prepare("select shfc.year_of_study,shfc.mean_salary,f.faculty_name,f.faculty_catergory,s.school_name,c.course_name,shfc.course_fee from school_have_faculty_course shfc, school s, course c, faculty f where shfc.school_id = s.school_id and shfc.course_id = c.course_id and shfc.faculty_id = f.faculty_id");
 $stmt->execute();
 $json = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $json = array_values($json);
