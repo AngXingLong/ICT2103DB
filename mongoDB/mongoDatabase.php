@@ -8,6 +8,5 @@
  $dbName = '1800867CYH';
  $connString = 'mongodb://' . $dbUser . ':' . $dbPassword . '@' . $hostAddress . '/' . $dbName;
  $client = new MongoDB\Client($connString);
- 
 
 ?>  
