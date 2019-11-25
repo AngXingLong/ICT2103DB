@@ -168,7 +168,7 @@ function getDataListValues($array){
 </ul>
 <br>
 <br>
-<h2>Recommanded Courses</h2>
+<h2>Recommended Courses</h2>
   <?php
       if($poly_get != "" & $uni_get != ""){
 
