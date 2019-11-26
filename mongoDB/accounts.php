@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<?php
 include('retrieveFromDB/data.php');
 
 if (isset($_GET['intent']) && isset($_GET['fname']) && isset($_GET['lname']) && isset($_GET['accname']) && isset($_GET['accpwd']) ) {
